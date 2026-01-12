@@ -1,16 +1,18 @@
-# Project Management API
+# Project Management Backend
 
 A simple Node.js REST API for managing users, projects, and tasks with authentication and role-based access control.
 
 ## Features
-- User signup & login (JWT authentication)
-- Admin and regular user roles
-- Create, view, and delete projects (admin only for create/delete)
-- Assign users to projects
-- Create, view, update, and delete tasks (admin only for create/update/delete)
-- Minimal input validation (zod)
-- Duplicate prevention for emails, projects, and tasks
-- Robust error handling and status codes
+- Authentication (JWT-based user login and signup)
+- Authorization (role-based access: admin and user)
+- Project management (create, view, delete projects)
+- Task management (create, view, update, delete tasks)
+- User management (signup, login, role assignment)
+- Input validation (using zod)
+- Duplicate prevention (unique emails, project titles, task assignments)
+- Error handling (with proper status codes and messages)
+- Secure password storage (bcrypt hashing)
+- MongoDB integration (with Mongoose ODM)
 
 ## Tech Stack
 - Node.js + Express
