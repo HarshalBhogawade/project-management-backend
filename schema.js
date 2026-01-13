@@ -10,7 +10,7 @@ const userSchema = new Schema({
         enum: ["user", "admin"],
         default : "user"
     }
-})
+});
 
 const projectSchema = new Schema({
     title : {type: String, required: true},

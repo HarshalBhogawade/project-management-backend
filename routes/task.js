@@ -88,11 +88,21 @@ taskRouter.post('/tasks', userAuth, adminAuth, async function (req, res) {
 //get view task
 taskRouter.get('/tasks', userAuth, async function (req, res) {
     try {
-        let tasks;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 1;
+        const skip = (page-1) * limit;
+
+
+        //filtering
+        const {status , priority, project} = req.query;
+        let filter  = {};
+
         // ADMIN: can see every task
         if (req.user.role === 'admin') {
-            tasks = await Task.find();
-            return res.status(200).json({ tasks });
+            if(status) filter.status = status;
+            if(priority) filter.priority = priority;
+            if(project) filter.project = project;
+
         } else {
             // USER: find projects where user is a member
             const projects = await Project.find({
@@ -102,24 +112,28 @@ taskRouter.get('/tasks', userAuth, async function (req, res) {
             // extract project ids for task query
             const projectIds = projects.map(p => p._id);
 
-            // USER: get tasks assigned to user OR tasks of member projects
-            tasks = await Task.find({
-                $or: [
-                    { assignedto: req.user.id },
-                    { project: { $in: projectIds } }
-                ]
-            });
+            filter.$or= [
+                {assignedto : req.user.id},
+                {project : { $in:projectIds } }
+            ]
+            
+            if(status) filter.status = status;
+            if(priority) filter.priority = priority;
+            if(project) filter.project = project;
 
-            // no accessible tasks
-            if (tasks.length === 0) {
-                return res.status(404).json({
-                    error: 'you dont have any tasks assigned.'
-                });
-            }
-
-            // return accessible tasks
-            return res.status(200).json({ tasks });
         }
+        const total = await Task.countDocuments(filter);
+        const tasks = await Task.find(filter)
+            .skip(skip)
+            .limit(limit);
+
+        res.status(200).json({ 
+            tasks,
+            page,
+            totalPages: Math.ceil(total / limit),
+            total
+        });
+
     } catch (error) {
         res.status(500).json({ 
             error: "Internal server error",

@@ -42,27 +42,53 @@ projectRouter.post('/project',userAuth,adminAuth, async function(req,res){
         });
     }
 })
-//get view all projects 
+//get view all projects with pagination and filtering 
 projectRouter.get('/project',userAuth,async function(req,res){
     try {
+        const page = parseInt(req.query.page) || 1; //get page val from url https://projects?page=1&limit=5
+        const limit = parseInt(req.query.limit) || 1;
+        const skip = (page-1)*limit;
+
         let projects;
 
         //admin gets all the projects + authorization
         if(req.user.role === 'admin'){
-            projects = await Project.find();
+            const total = await Project.countDocuments(); //countDocuments() gets total number
+                                                         //  of projects in the collection
+            projects = await Project.find()
+                .skip(skip) //skip the pages
+                .limit(limit) //restricts the output
+            
+            return res.status(200).json({
+                projects,
+                page,
+                totalPages : Math.ceil(total/limit),
+                total //cnt of total projects / entries 
+            });
         }else{ 
             //if not admin gets projects the user owns or 
             //projects your are member offf
-            projects = await Project.find({
-                $or:[{owner:req.user.id},
-                      {members : req.user.id}   
-                    ]
-            })
+            const filter = { //get rule for filtering projects 
+                $or : [
+                    {owner : req.user.id},
+                    {members : req.user.id}
+                ]
+            }
+
+
+            const total = await Project.countDocuments(filter); //count how many records matches this rule
+            projects = await Project.find(filter)
+                .skip(skip)
+                .limit(limit);
+            
+            return res.status(200).json({
+                projects,
+                page,
+                totalPages: Math.ceil(total / limit),
+                total
+            });
         }
 
-        res.status(200).json({
-            projects
-        })
     } catch (error) {
         res.status(500).json({ 
             error: "Internal server error",

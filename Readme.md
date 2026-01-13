@@ -47,6 +47,9 @@ See `test-data.md` for example requests and dummy data.
 ---
  
 ### Future Work
+- Paging  (done)
+- filtering (done)
+- Rate limiting 
+- Redis Cache
 - Create frontend using react
 - Conncet fe to be
-
