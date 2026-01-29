@@ -27,6 +27,7 @@ A simple Node.js REST API for managing users, projects, and tasks with authentic
 2. Run `npm install`
 3. Set up your MongoDB connection in `config/db.js`
 4. Start the server: `node server.js`
+5. Access API documentation at: `http://localhost:3000/api-docs`
 
 ## API Endpoints
 - `POST /api/v1/signup` — Register a new user
@@ -45,11 +46,11 @@ A simple Node.js REST API for managing users, projects, and tasks with authentic
 See `test-data.md` for example requests and dummy data.
 
 ---
- 
+
 ### Future Work
 - Paging  (done)
 - filtering (done)
-- Rate limiting 
+- Rate limiting
 - Redis Cache
 - Create frontend using react
 - Conncet fe to be
